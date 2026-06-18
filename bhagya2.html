@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Tracking Register</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI,sans-serif;
+}
+
+body{
+    background:#f4f6f9;
+}
+
+.container{
+    display:flex;
+    min-height:100vh;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:250px;
+    background:#1e293b;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    margin-bottom:20px;
+}
+
+.sidebar button{
+    width:100%;
+    padding:12px;
+    margin-bottom:10px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#334155;
+    color:white;
+    font-size:15px;
+}
+
+.sidebar button:hover,
+.sidebar button.active{
+    background:#2563eb;
+}
+
+/* Main */
+
+.main{
+    flex:1;
+    padding:25px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.search-box{
+    width:280px;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+}
+
+/* Stats */
+
+.stats{
+    display:flex;
+    gap:20px;
+    margin-bottom:25px;
+}
+
+.stat-card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    width:180px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.stat-card h2{
+    margin-top:10px;
+}
+
+/* Grid */
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    padding:18px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.card h3{
+    margin-bottom:10px;
+    color:#1e293b;
+}
+
+.card p{
+    margin:8px 0;
+}
+
+.assigned{
+    color:red;
+    font-weight:bold;
+}
+
+.available{
+    color:green;
+    font-weight:bold;
+}
+
+.assign-btn{
+    margin-top:10px;
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+.assign-btn:hover{
+    background:#1d4ed8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+        <h2>Categories</h2>
+
+        <button class="active" onclick="filterAssets('All',this)">All</button>
+        <button onclick="filterAssets('Laptop',this)">Laptops</button>
+        <button onclick="filterAssets('Mouse',this)">Mouse</button>
+    </div>
+
+    <!-- Main Content -->
+
+    <div class="main">
+
+        <div class="header">
+            <h1>Asset Tracking Register</h1>
+
+            <input
+                type="text"
+                id="search"
+                class="search-box"
+                placeholder="Search Assets..."
+                onkeyup="searchAssets()">
+        </div>
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <h4>Total Assets</h4>
+                <h2 id="totalAssets">0</h2>
+            </div>
+
+            <div class="stat-card">
+                <h4>Assigned</h4>
+                <h2 id="assignedAssets">0</h2>
+            </div>
+
+            <div class="stat-card">
+                <h4>Available</h4>
+                <h2 id="availableAssets">0</h2>
+            </div>
+
+        </div>
+
+        <div class="grid" id="assetGrid"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+let currentCategory = "All";
+
+let assets = [
+{
+id:1,
+name:"Dell Latitude 5420",
+category:"Laptop",
+assignedTo:"John Doe",
+status:"Assigned"
+},
+{
+id:2,
+name:"HP ProBook 450",
+category:"Laptop",
+assignedTo:"",
+status:"Available"
+},
+{
+id:3,
+name:"Lenovo ThinkPad",
+category:"Laptop",
+assignedTo:"Emma Smith",
+status:"Assigned"
+},
+{
+id:4,
+name:"Logitech M235",
+category:"Mouse",
+assignedTo:"",
+status:"Available"
+},
+{
+id:5,
+name:"Dell Wireless Mouse",
+category:"Mouse",
+assignedTo:"Alex",
+status:"Assigned"
+},
+{
+id:6,
+name:"HP USB Mouse",
+category:"Mouse",
+assignedTo:"",
+status:"Available"
+}
+];
+
+function renderAssets(){
+
+const grid = document.getElementById("assetGrid");
+
+const searchValue =
+document.getElementById("search")
+.value.toLowerCase();
+
+let filtered = assets.filter(asset => {
+
+const categoryMatch =
+currentCategory === "All" ||
+asset.category === currentCategory;
+
+const searchMatch =
+asset.name.toLowerCase().includes(searchValue);
+
+return categoryMatch && searchMatch;
+
+});
+
+grid.innerHTML = "";
+
+filtered.forEach(asset => {
+
+grid.innerHTML += `
+<div class="card">
+
+<h3>${asset.name}</h3>
+
+<p><strong>Category:</strong> ${asset.category}</p>
+
+<p>
+<strong>Status:</strong>
+<span class="${asset.status === 'Assigned'
+? 'assigned'
+: 'available'}">
+${asset.status}
+</span>
+</p>
+
+<p>
+<strong>Employee:</strong>
+${asset.assignedTo || "Not Assigned"}
+</p>
+
+${asset.status === "Available"
+?
+`<button class="assign-btn"
+onclick="assignAsset(${asset.id})">
+Assign Asset
+</button>`
+:
+""}
+
+</div>
+`;
+
+});
+
+updateStats();
+}
+
+function assignAsset(id){
+
+const employee =
+prompt("Enter Employee Name");
+
+if(!employee) return;
+
+assets = assets.map(asset => {
+
+if(asset.id === id){
+
+return {
+...asset,
+assignedTo:employee,
+status:"Assigned"
+};
+
+}
+
+return asset;
+
+});
+
+renderAssets();
+}
+
+function filterAssets(category,btn){
+
+currentCategory = category;
+
+document
+.querySelectorAll(".sidebar button")
+.forEach(button =>
+button.classList.remove("active")
+);
+
+btn.classList.add("active");
+
+renderAssets();
+}
+
+function searchAssets(){
+renderAssets();
+}
+
+function updateStats(){
+
+document.getElementById("totalAssets")
+.textContent = assets.length;
+
+document.getElementById("assignedAssets")
+.textContent =
+assets.filter(
+a => a.status === "Assigned"
+).length;
+
+document.getElementById("availableAssets")
+.textContent =
+assets.filter(
+a => a.status === "Available"
+).length;
+}
+
+renderAssets();
+
+</script>
+
+</body>
+</html>
