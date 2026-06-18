@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Player</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#16285c;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+}
+
+.player{
+    width:500px;
+    background:#324785;
+    padding:20px;
+    border-radius:25px;
+    color:white;
+}
+
+#searchBox{
+    width:100%;
+    padding:15px;
+    border-radius:25px;
+    border:none;
+    outline:none;
+    margin-bottom:20px;
+    font-size:16px;
+}
+
+audio{
+    width:100%;
+    margin-bottom:20px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.song{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:10px;
+    border-radius:12px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.song:hover{
+    background:#4580f0;
+}
+
+.song img{
+    width:60px;
+    height:60px;
+    border-radius:10px;
+    object-fit:cover;
+}
+
+.song-info{
+    flex:1;
+}
+
+.song-title{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.song-artist{
+    color:#ddd;
+}
+
+.heart{
+    font-size:22px;
+}
+</style>
+</head>
+<body>
+
+<div class="player">
+
+    <input
+        type="text"
+        id="searchBox"
+        placeholder="🔍 Search songs..."
+        onkeyup="searchSongs()">
+
+    <audio id="audioPlayer" controls></audio>
+
+    <div class="header">
+        <h1>Playlist</h1>
+        <h2 id="songCount"></h2>
+    </div>
+
+    <div id="playlist"></div>
+
+</div>
+
+<script>
+
+const songs = [
+{
+title:"Acoustic Song",
+artist:"John Doe",
+src:"songs/acoustic.mp3",
+cover:"https://picsum.photos/100?1"
+},
+{
+title:"Relaxing Beat",
+artist:"DJ Chill",
+src:"songs/relaxing.mp3",
+cover:"https://picsum.photos/100?2"
+},
+{
+title:"Electronic Mix",
+artist:"Electro Wave",
+src:"songs/electronic.mp3",
+cover:"https://picsum.photos/100?3"
+},
+{
+title:"Sunset Drive",
+artist:"Night Rider",
+src:"songs/sunset.mp3",
+cover:"https://picsum.photos/100?4"
+},
+{
+title:"Midnight City",
+artist:"Synth Avenue",
+src:"songs/midnight.mp3",
+cover:"https://picsum.photos/100?5"
+},
+{
+title:"Chill Vibes",
+artist:"Lo-Fi Beats",
+src:"songs/chill.mp3",
+cover:"https://picsum.photos/100?6"
+},
+{
+title:"Ocean Breeze",
+artist:"Sea Sounds",
+src:"songs/ocean.mp3",
+cover:"https://picsum.photos/100?7"
+},
+{
+title:"Dreamscape",
+artist:"Ambient Mood",
+src:"songs/dreamscape.mp3",
+cover:"https://picsum.photos/100?8"
+},
+{
+title:"Morning Coffee",
+artist:"Acoustic Mornings",
+src:"songs/morning.mp3",
+cover:"https://picsum.photos/100?9"
+}
+];
+
+const playlist = document.getElementById("playlist");
+const audioPlayer = document.getElementById("audioPlayer");
+
+document.getElementById("songCount").innerText =
+songs.length + " Songs";
+
+songs.forEach((song,index)=>{
+
+playlist.innerHTML += `
+<div class="song" data-index="${index}">
+    <img src="${song.cover}">
+    
+    <div class="song-info">
+        <div class="song-title">${song.title}</div>
+        <div class="song-artist">${song.artist}</div>
+    </div>
+
+    <div class="heart">🤍</div>
+</div>
+`;
+
+});
+
+document.addEventListener("click",(e)=>{
+
+const songCard = e.target.closest(".song");
+
+if(!songCard) return;
+
+const index = songCard.dataset.index;
+
+audioPlayer.src = songs[index].src;
+audioPlayer.play();
+
+});
+
+function searchSongs(){
+
+const searchValue =
+document.getElementById("searchBox")
+.value
+.toLowerCase();
+
+const songCards =
+document.querySelectorAll(".song");
+
+songCards.forEach(card=>{
+
+const title =
+card.querySelector(".song-title")
+.textContent
+.toLowerCase();
+
+const artist =
+card.querySelector(".song-artist")
+.textContent
+.toLowerCase();
+
+if(
+title.includes(searchValue) ||
+artist.includes(searchValue)
+){
+card.style.display="flex";
+}
+else{
+card.style.display="none";
+}
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
